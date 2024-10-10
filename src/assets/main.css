@@ -1,0 +1,87 @@
+@import './base.css';
+@import './own.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+#app {
+  width: 100%;
+  margin: 0;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 701px) {
+  body {
+    /* display: flex; */
+    place-items: center;
+  }
+}
+#app {
+  display: contents;
+}
+.user-logo {
+  width: calc(var(--width-search) + 6px);
+  height: calc(var(--width-search) + 6px);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.user-logedin {
+  background-image: url('@/assets/user_ok.svg');
+}
+.user-notlogedin {
+  background-image: url('@/assets/user.svg');
+}
+.cart-fill {
+  background-image: url('@/assets/cartfill.svg');
+}
+.cart-empty {
+  background-image: url('@/assets/cartempty.svg');
+}
+.more-svg {
+  background-image: url(/src/assets/svg/more.svg);
+  background-size: cover;
+  height: 200px;
+  width: 200px;
+  position: relative;
+  top: -40%;
+}
+.transparent-button {
+  padding: 0px;
+  margin: 0px;
+  background-color: transparent;
+}
+.but-on-underline:hover {
+  border-bottom: 2px solid black !important;
+  transition: 0.4s;
+}
+.but-on-underline:active {
+  border-bottom: 0px solid black !important;
+}
+
+button:hover {
+  cursor: pointer;
+}
