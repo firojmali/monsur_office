@@ -1,40 +1,151 @@
 <script setup lang="ts">
+import '@/functions/interfeces'
+import { login } from '@/api/user'
 import { useMenuItemsStore } from './store/menuItems'
+import { useUserItemStore } from './store/userItem'
+// import { useProductsStore } from './store/product'
 import serverdata from './sedoserver/serveritems'
 </script>
 
 <template>
-  <body :class="{ bgloadding: loadding }">
-    <div class="loadding" v-if="loadding">
+  <body :class="{ bgloadding: loadding }" class="w-full">
+    <el-button v-if="is_loged_in" @click="logout" type="primary" class="m-2">Logout</el-button>
+    <div class="loadding" v-if="loadding || logoutloadding">
       <div class="loader"></div>
       loadding
     </div>
-    <RouterView v-else />
+    <div v-else-if="!is_loged_in">
+      <div class="login-body shadow-otto">
+        <h3 style="text-align: center">Login</h3>
+        <div class="useridbody">
+          <span>Your User ID:</span><span><input type="text" v-model="loginfeilds.user_id" /></span>
+        </div>
+        <div class="passwordbody">
+          <span>Your Password:</span
+          ><span><input type="password" v-model="loginfeilds.password" /></span>
+        </div>
+        <button class="button-add-cart w-full text-center" role="button" @click="userLogin">
+          Log In
+        </button>
+      </div>
+    </div>
+    <div v-else class="w-full p-4">
+      <div class="w-full h-6 fixed">menubar</div>
+      <div class="h-6 w-full"></div>
+      <div class="w-full h-full shadow-md router-container m-4">
+        <RouterView />
+      </div>
+    </div>
   </body>
 </template>
 <script lang="ts">
 export default {
   data() {
+    const user: any = {}
     return {
+      activework: false,
       loadding: true,
-      menustore: useMenuItemsStore()
+      menustore: useMenuItemsStore(),
+      userState: useUserItemStore(),
+      is_loged_in: false,
+      logoutloadding: false,
+      user,
+      user1: {
+        id: 0,
+        uid: '',
+        user_id: 0,
+        name: '',
+        loginInfo: null
+      },
+      loginuserid: 0,
+      loginpassword: 0,
+      loginfeilds: {
+        user_id: '',
+        password: ''
+      }
     }
   },
   created() {
-    this.getcommondatas()
-    setInterval(this.getcommondatas, 30000)
+    var presentdt = parseInt(String(Date.now() / 1000))
+    this.checkLogIn()
+    this.getcommondatas(presentdt)
+  },
+  watch: {
+    is_loged_in(newV, oldV) {
+      if (newV != oldV && newV) {
+        //this.checkLogIn()
+      }
+    }
   },
   methods: {
-    getcommondatas() {
-      var presentdt = parseInt(String(Date.now() / 1000))
-      presentdt = presentdt - 1 * 60 * 60 //next data update interval
+    userLogin() {
+      this.activework = true
+      new Promise((resolve, reject) => {
+        login({ name: this.loginfeilds.user_id, password: this.loginfeilds.password })
+          .then((res: any) => {
+            this.activework = false
+            if (res.code == 20000) {
+              //log in success
+              const userstore = useUserItemStore()
+              userstore.setLogin(res.data)
+              this.checkLogIn()
+            } else {
+              //login not success
+              this.loginfeilds.user_id = ''
+              this.loginfeilds.password = ''
+            }
+            location.reload()
+            resolve(true)
+          })
+          .catch((err: string) => {
+            this.activework = false
+            reject(false)
+            console.log(err)
+          })
+      })
+    },
+    logout() {
+      this.loadding = true
+      const userstore = useUserItemStore()
+      userstore.logout()
+      this.logoutloadding = true
+    },
+    // UserLogin() {
+    //   //var userlogin = serverdata.methods.userLogin(this.loginfeilds)
+    //   if (userlogin && userlogin.loginInfo.isLogIn) {
+    //     const userstore = useUserItemStore()
+    //     userstore.setAll(userlogin)
+    //     this.checkLogIn()
+    //     console.log('User login', this.is_loged_in, userlogin)
+    //   }
+    // },
+    checkLogIn() {
+      const userstore = useUserItemStore()
+      if (userstore.user != null) {
+        this.user = userstore.getUser
+      }
+      if (userstore.user != null && userstore.is_login()) {
+        this.is_loged_in = true
+        //console.log(userstore.getuserRoutes())
+        setTimeout(this.checkLogIn, 5000)
+      } else {
+        this.loginfeilds.user_id = this.user.user_id
+        this.loginfeilds.password = ''
+        this.loadding = false
+        this.is_loged_in = false
+      }
+      this.logoutloadding = false
+      //console.log('Check Login', this.is_loged_in)
+    },
+    getcommondatas(presentdt: number) {
+      presentdt = presentdt - 5 * 60 //next data update interval
       const menustore = useMenuItemsStore()
       if (
         menustore.allCats.length > 0 &&
         menustore.std &&
         parseInt(String(menustore.std)) > presentdt
       ) {
-        console.log('previous value')
+        //console.log('previous value')
       } else {
         console.log('new stor created')
         menustore.setAll(serverdata.methods.createDummyData())
@@ -47,6 +158,19 @@ export default {
 }
 </script>
 <style lang="css" scoped>
+.router-container {
+  width: calc(100% - 8px);
+  box-shadow:
+    inset 17px 18px 20px 20px #90ddb980,
+    -1px 2px 0px 0px #6127d3db,
+    12px 12px 15px 3px;
+}
+.login-body {
+  max-width: 100%;
+  width: fit-content;
+  margin: auto;
+  margin-top: 80px;
+}
 .loadding {
   color: #000834;
   font-weight: 900;

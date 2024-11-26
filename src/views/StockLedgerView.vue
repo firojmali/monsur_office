@@ -1,7 +1,4 @@
-<script setup lang="ts">
-import TopFixed from '@/components/top/TopFixed.vue'
-import CatIndex from '../components/cat/CatIndex.vue'
-</script>
+<script setup lang="ts"></script>
 <template>
   <TopFixed class="desktop-only"></TopFixed>
   <div class="desktop-only w-full" style="height: 92px"></div>
@@ -26,6 +23,7 @@ export default {
   methods: {
     getrouteparameter() {
       this.cat_id = parseInt(String(this.$route.params.id))
+      console.log('stockid', this.cat_id)
     }
     // menuClicked(params) {
     //   console.log('emit ', params)

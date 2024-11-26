@@ -6,6 +6,21 @@ const serverdata = {
     }
   },
   methods: {
+    userLogin(data = { user_id: 0, password: '' }) {
+      return {
+        id: 1,
+        user_id: data.user_id,
+        uid: 'string',
+        name: 'Mr. UserName',
+        loginInfo: {
+          loginTime: parseInt(String(Date.now() / 1000)),
+          updateTime: parseInt(String(Date.now() / 1000)),
+          expireTime: parseInt(String(Date.now() / 1000)) + 3600,
+          isLogIn: true
+        },
+        user_roles: [{ id: 1, name: 'Admin', role: 'admin', info_id_json: '' }]
+      }
+    },
     sedoimageurl() {
       return [
         'https://s.alicdn.com/@sc04/kf/Ha818056626754fbfb8de5e1b4f784357Q.jpg_720x720q50.jpg',
