@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import '@/functions/interfeces'
-import { getAllProducts } from '@/api/product'
+import { getProducts } from '@/api/product'
 
 export const useProductsStore = defineStore('menuItems', {
   state: (): ProductState => ({
@@ -12,7 +12,7 @@ export const useProductsStore = defineStore('menuItems', {
     getProducts() {
       this.updating = true
       new Promise((resolve, reject) => {
-        getAllProducts()
+        getProducts(1)
           .then((res: any) => {
             this.products = res.data
             this.updating = false

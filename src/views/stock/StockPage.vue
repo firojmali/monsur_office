@@ -1,47 +1,63 @@
 <template>
   <div class="w-full flex">
     <div class="w-1/3">
-      <el-button v-if="current_job == 'show'" @click="handleAdd" type="primary" class="m-2">
+      <!-- <el-button v-if="current_job == 'show'" @click="handleAdd" type="primary" class="m-2">
         Add Product
-      </el-button>
+      </el-button> -->
     </div>
     <div class="w-1/3 text-center">
-      <b v-if="current_job == 'add'">ADD PRODUCT</b>
-      <b v-if="current_job == 'show'">PRODUCTS</b>
+      <b v-if="current_job == 'add'">Stock Balance</b>
+      <b v-if="current_job == 'show'">Stock Balance</b>
       <b v-if="current_job == 'edit'">EDIT: {{ handleProduct.name }}</b>
     </div>
-    <div v-if="current_job == 'show'" class="w-1/3">filter</div>
+    <div v-if="current_job == 'show'" class="w-1/3">
+      <el-input
+        v-model="searchintable"
+        size="small"
+        placeholder="Type to search"
+        @input="filterTableData()"
+      />
+    </div>
   </div>
   <!-- Show Products -->
   <el-table v-if="current_job == 'show'" :data="showproducts" v-loading="show_table_loadding">
     <el-table-column label="ID" prop="id" />
-    <el-table-column label="Name" sortable prop="name" />
-    <el-table-column label="Type" sortable prop="type" />
-    <el-table-column label="Identity">
+    <el-table-column label="Product">
       <template #default="scope">
         <el-tag :type="scope.row.is_complete ? 'primary' : 'success'" disable-transitions
-          >{{ scope.row.is_complete ? 'Complete Product' : 'Raw Materials' }}
-        </el-tag>
-        <el-tag v-if="!scope.row.is_saleable" type="info" disable-transitions>Not For Sale</el-tag>
+          >{{ scope.row.type }} </el-tag
+        >:
+        <el-tag :type="scope.row.is_saleable ? 'primary' : 'success'" disable-transitions>{{
+          scope.row.name
+        }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column label="Unit">
-      <template #default="scope">{{ scope.row.unit.unit }}</template>
-    </el-table-column>
-    <el-table-column align="right">
-      <template #header>
-        <el-input
-          v-model="searchintable"
-          size="small"
-          placeholder="Type to search"
-          @input="filterTableData()"
-        />
-      </template>
+    <el-table-column label="Good Balance">
       <template #default="scope">
-        <el-button size="small" @click="handleEdit(scope.$index, scope.row)"> Edit </el-button>
-        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-          Delete
-        </el-button>
+        {{
+          scope.row.stock
+            ? scope.row.stock.opening_quantity_good + ' ' + scope.row.unit.unit
+            : 'Not Fond'
+        }}
+      </template>
+    </el-table-column>
+    <el-table-column label="Damaged Balance">
+      <template #default="scope">
+        {{
+          scope.row.stock
+            ? scope.row.stock.opening_quantity_damaged + ' ' + scope.row.unit.unit
+            : 'Not Fond'
+        }}
+      </template>
+    </el-table-column>
+    <el-table-column label="Total Balance">
+      <template #default="scope">
+        {{
+          scope.row.stock
+            ? scope.row.stock.opening_quantity_good + scope.row.stock.opening_quantity_damaged
+            : 'Not Fond'
+        }}
+        {{ scope.row.stock ? scope.row.unit.unit : '' }}
       </template>
     </el-table-column>
   </el-table>

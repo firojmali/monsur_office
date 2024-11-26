@@ -9,7 +9,6 @@ import { getToken, getTokenId } from '@/utils/auth'
 
 const token = getToken()
 const tokenid = getTokenId()
-console.log('in request coockie', token, tokenid)
 const base_local = 'http://127.0.0.1:8000/api'
 const base_remote = 'https://at.mmtgroupbd.com/public/api'
 let base_active = base_local

@@ -8,7 +8,7 @@ export function getProducts(page: string | number) {
 }
 export function getProductsWithStockBalance(page: string | number) {
   return request({
-    url: '/products?page=' + page,
+    url: '/productswithstock?page=' + page,
     method: 'get'
   })
 }

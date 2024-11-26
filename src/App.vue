@@ -30,8 +30,55 @@ import serverdata from './sedoserver/serveritems'
       </div>
     </div>
     <div v-else class="w-full p-4">
-      <div class="w-full h-6 fixed">menubar</div>
-      <div class="h-6 w-full"></div>
+      <div class="w-full h-12 fixed">
+        <el-menu
+          ellipsis
+          :default-active="getrouternameindex()"
+          class="el-menu-popper-demo"
+          mode="horizontal"
+          :popper-offset="16"
+          style="max-width: 600px"
+        >
+          <RouterLink v-for="menuItem in menu" :key="menuItem.menu_index" :to="menuItem.router_to"
+            ><el-menu-item :index="menuItem.menu_index">{{
+              menuItem.label
+            }}</el-menu-item></RouterLink
+          >
+          <!-- <el-menu-item
+            v-for="menuItem in menu"
+            :key="menuItem.menu_index"
+            :index="menuItem.menu_index"
+            ><RouterLink :to="menuItem.router_to">{{ menuItem.label }}</RouterLink></el-menu-item
+          > -->
+          <!-- <el-sub-menu index="2">
+            <template #title>Workspace</template>
+            <el-menu-item index="2-1">item one</el-menu-item>
+            <el-menu-item index="2-2">item two</el-menu-item>
+            <el-menu-item index="2-3">item three</el-menu-item>
+            <el-sub-menu index="2-4">
+              <template #title>item four</template>
+              <el-menu-item index="2-4-1">item one</el-menu-item>
+              <el-menu-item index="2-4-2">item two</el-menu-item>
+              <el-menu-item index="2-4-3">item three</el-menu-item>
+            </el-sub-menu>
+          </el-sub-menu>
+          <el-sub-menu index="3" :popper-offset="8">
+            <template #title>Override Popper Offset</template>
+            <el-menu-item index="3-1">item one</el-menu-item>
+            <el-menu-item index="3-2">item two</el-menu-item>
+            <el-menu-item index="3-3">item three</el-menu-item>
+            <el-sub-menu index="3-4" :popper-offset="20">
+              <template #title>override child</template>
+              <el-menu-item index="3-4-1">item one</el-menu-item>
+              <el-menu-item index="3-4-2">item two</el-menu-item>
+              <el-menu-item index="3-4-3">item three</el-menu-item>
+            </el-sub-menu>
+          </el-sub-menu>
+          <el-menu-item index="4" disabled>Info</el-menu-item>
+          <el-menu-item index="5">Orders</el-menu-item> -->
+        </el-menu>
+      </div>
+      <div class="h-12 w-full"></div>
       <div class="w-full h-full shadow-md router-container m-4">
         <RouterView />
       </div>
@@ -50,6 +97,10 @@ export default {
       is_loged_in: false,
       logoutloadding: false,
       user,
+      menu: [
+        { label: 'Product', router_name: 'home', menu_index: '1', router_to: '/' },
+        { label: 'Stock', router_name: 'stock', menu_index: '2', router_to: '/stock' }
+      ],
       user1: {
         id: 0,
         uid: '',
@@ -78,6 +129,16 @@ export default {
     }
   },
   methods: {
+    getrouternameindex() {
+      const prn = this.$route.name
+      let index = null
+      this.menu.forEach((menuitem) => {
+        if (prn == menuitem.router_name) {
+          index = menuitem.menu_index
+        }
+      })
+      return index
+    },
     userLogin() {
       this.activework = true
       new Promise((resolve, reject) => {
