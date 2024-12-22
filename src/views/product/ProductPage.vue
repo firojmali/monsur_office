@@ -102,6 +102,7 @@ export default {
       menustore: useMenuItemsStore(),
       allitems: useMenuItemsStore().$state.commonCat,
       productTypes: [
+        'pump Controller',
         'Lamp',
         'Lamp SKD Items',
         'Cable',

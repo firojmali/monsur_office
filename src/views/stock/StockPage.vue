@@ -20,8 +20,13 @@
     </div>
   </div>
   <!-- Show Products -->
-  <el-table v-if="current_job == 'show'" :data="showproducts" v-loading="show_table_loadding">
-    <el-table-column label="ID" prop="id" />
+  <el-table
+    v-if="current_job == 'show'"
+    :data="showproducts"
+    v-loading="show_table_loadding"
+    style="max-width: 95%; margin: auto; margin-top: 2px; margin-bottom: 8px"
+  >
+    <el-table-column label="ID" prop="id" width="90" />
     <el-table-column label="Product">
       <template #default="scope">
         <el-tag :type="scope.row.is_complete ? 'primary' : 'success'" disable-transitions
@@ -32,32 +37,36 @@
         }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column label="Good Balance">
+    <el-table-column label="Good Balance" width="120">
       <template #default="scope">
-        {{
+        <span :style="{ color: scope.row.stock ? 'black' : 'red' }">{{
           scope.row.stock
             ? scope.row.stock.opening_quantity_good + ' ' + scope.row.unit.unit
             : 'Not Fond'
-        }}
+        }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Damaged Balance">
+    <el-table-column label="Damaged Balance" width="160">
       <template #default="scope">
-        {{
-          scope.row.stock
-            ? scope.row.stock.opening_quantity_damaged + ' ' + scope.row.unit.unit
-            : 'Not Fond'
-        }}
+        <span :style="{ color: scope.row.stock ? 'black' : 'red' }">
+          {{
+            scope.row.stock
+              ? scope.row.stock.opening_quantity_damaged + ' ' + scope.row.unit.unit
+              : 'Not Fond'
+          }}</span
+        >
       </template>
     </el-table-column>
-    <el-table-column label="Total Balance">
+    <el-table-column label="Total Balance" width="120">
       <template #default="scope">
-        {{
-          scope.row.stock
-            ? scope.row.stock.opening_quantity_good + scope.row.stock.opening_quantity_damaged
-            : 'Not Fond'
-        }}
-        {{ scope.row.stock ? scope.row.unit.unit : '' }}
+        <span :style="{ color: scope.row.stock ? 'black' : 'red' }"
+          >{{
+            scope.row.stock
+              ? scope.row.stock.opening_quantity_good + scope.row.stock.opening_quantity_damaged
+              : 'Not Fond'
+          }}
+          {{ scope.row.stock ? scope.row.unit.unit : '' }}</span
+        >
       </template>
     </el-table-column>
   </el-table>
@@ -113,7 +122,9 @@ export default {
     this.user_name = 'MFMALI'
     //console.log(this.user_name)
   },
-  updated() {},
+  updated() {
+    // this.getproductswithstockbalance()
+  },
   methods: {
     doneaddedit() {
       this.getproductswithstockbalance(this.current_page)
@@ -168,7 +179,9 @@ export default {
     filterTableData() {
       this.showproducts = this.products.filter(
         (data) =>
-          !this.searchintable || data.name.toLowerCase().includes(this.searchintable.toLowerCase())
+          !this.searchintable ||
+          data.name.toLowerCase().includes(this.searchintable.toLowerCase()) ||
+          data.type.toLowerCase().includes(this.searchintable.toLowerCase())
       )
     },
     handleEdit(index: number, row: User) {

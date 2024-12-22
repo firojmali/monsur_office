@@ -13,3 +13,10 @@ export function login(data: {}) {
     data
   })
 }
+
+export function testApi() {
+  return request({
+    url: '/get',
+    method: 'get'
+  })
+}

@@ -148,6 +148,7 @@ export default {
       handleProduct,
       productUnits,
       productTypes: [
+        'pump Controller',
         'Lamp',
         'Lamp SKD Items',
         'Cable',

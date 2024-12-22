@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import '@/functions/interfeces'
-import { login } from '@/api/user'
+import { login, testApi } from '@/api/user'
 import { useMenuItemsStore } from './store/menuItems'
 import { useUserItemStore } from './store/userItem'
 // import { useProductsStore } from './store/product'
@@ -39,11 +39,24 @@ import serverdata from './sedoserver/serveritems'
           :popper-offset="16"
           style="max-width: 600px"
         >
-          <RouterLink v-for="menuItem in menu" :key="menuItem.menu_index" :to="menuItem.router_to"
-            ><el-menu-item :index="menuItem.menu_index">{{
-              menuItem.label
-            }}</el-menu-item></RouterLink
-          >
+          <templete v-for="menuItem in menu" :key="menuItem.menu_index">
+            <el-menu-item
+              v-if="menuItem.sub.length < 1"
+              :index="menuItem.menu_index"
+              @click="gotoroute(menuItem.router_to)"
+              >{{ menuItem.label }}</el-menu-item
+            >
+            <el-sub-menu v-else :index="menuItem.menu_index">
+              <template #title>{{ menuItem.label }}</template>
+              <el-menu-item
+                v-for="menuItems in menuItem.sub"
+                :key="menuItems.menu_index"
+                :index="menuItem.menu_index + '-' + menuItems.menu_index"
+                @click="gotoroute(menuItems.router_to)"
+                >{{ menuItems.label }}</el-menu-item
+              >
+            </el-sub-menu>
+          </templete>
           <!-- <el-menu-item
             v-for="menuItem in menu"
             :key="menuItem.menu_index"
@@ -98,8 +111,43 @@ export default {
       logoutloadding: false,
       user,
       menu: [
-        { label: 'Product', router_name: 'home', menu_index: '1', router_to: '/' },
-        { label: 'Stock', router_name: 'stock', menu_index: '2', router_to: '/stock' }
+        { label: 'Product', router_name: 'home', menu_index: '1', router_to: '/', sub: [] },
+        {
+          label: 'Challan',
+          router_name: 'challan',
+          menu_index: '1',
+          router_to: '/challan',
+          sub: []
+        },
+        {
+          label: 'Stock',
+          router_name: '',
+          menu_index: '2',
+          router_to: '',
+          sub: [
+            {
+              label: 'Balance',
+              router_name: 'stock',
+              menu_index: '1',
+              router_to: '/stock',
+              sub: []
+            },
+            {
+              label: 'Closing',
+              router_name: 'stock_closing',
+              menu_index: '2',
+              router_to: '/stock/closing',
+              sub: []
+            },
+            {
+              label: 'Set Starting Balance',
+              router_name: 'stock_start',
+              menu_index: '3',
+              router_to: '/stock/onetime/start',
+              sub: []
+            }
+          ]
+        }
       ],
       user1: {
         id: 0,
@@ -117,6 +165,7 @@ export default {
     }
   },
   created() {
+    this.testserver()
     var presentdt = parseInt(String(Date.now() / 1000))
     this.checkLogIn()
     this.getcommondatas(presentdt)
@@ -129,12 +178,42 @@ export default {
     }
   },
   methods: {
+    testserver() {
+      return new Promise((resolve, reject) => {
+        testApi()
+          .then((res: any) => {
+            console.log('api result:', res)
+          })
+          .catch((err: string) => {
+            reject(false)
+            console.log('api result Error:', err)
+            err
+          })
+      })
+    },
+    gotoroute(to: string) {
+      this.$router.push(to)
+    },
     getrouternameindex() {
       const prn = this.$route.name
-      let index = null
-      this.menu.forEach((menuitem) => {
-        if (prn == menuitem.router_name) {
-          index = menuitem.menu_index
+      const indx = this.getforeachmenuindex(prn, this.menu)
+      console.log(indx)
+      return indx
+    },
+    getforeachmenuindex(prn: any, menu: any, preindex: any = '') {
+      let index = '0'
+      menu.forEach((menuitem: any) => {
+        if (menuitem.sub.length > 0) {
+          if (index == '0')
+            index = this.getforeachmenuindex(
+              prn,
+              menuitem.sub,
+              preindex + menuitem.menu_index + '-'
+            )
+        } else {
+          if (prn == menuitem.router_name) {
+            index = preindex + menuitem.menu_index
+          }
         }
       })
       return index
@@ -160,8 +239,8 @@ export default {
           })
           .catch((err: string) => {
             this.activework = false
-            reject(false)
             console.log(err)
+            reject(false)
           })
       })
     },
