@@ -33,6 +33,7 @@ service.interceptors.request.use(
     // }
     //config.headers['token'] = token
     //config.headers['tokenid'] = tokenid
+    config.headers['Origin'] = 'https://www.bangladesh.gov.bd'
     return config
   },
   (error) => {

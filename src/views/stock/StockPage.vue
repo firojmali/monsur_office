@@ -26,7 +26,13 @@
     v-loading="show_table_loadding"
     style="max-width: 95%; margin: auto; margin-top: 2px; margin-bottom: 8px"
   >
-    <el-table-column label="ID" prop="id" width="90" />
+    <el-table-column label="ID" width="90">
+      <template #default="scope">
+        <el-button size="small" @click="handlechallanhistry(scope.row)" type="primary">
+          {{ scope.row.id }}
+        </el-button>
+      </template>
+    </el-table-column>
     <el-table-column label="Product">
       <template #default="scope">
         <el-tag :type="scope.row.is_complete ? 'primary' : 'success'" disable-transitions
@@ -40,9 +46,7 @@
     <el-table-column label="Good Balance" width="120">
       <template #default="scope">
         <span :style="{ color: scope.row.stock ? 'black' : 'red' }">{{
-          scope.row.stock
-            ? scope.row.stock.opening_quantity_good + ' ' + scope.row.unit.unit
-            : 'Not Fond'
+          scope.row.stock ? scope.row.stock.quantity_good + ' ' + scope.row.unit.unit : 'Not Fond'
         }}</span>
       </template>
     </el-table-column>
@@ -51,7 +55,7 @@
         <span :style="{ color: scope.row.stock ? 'black' : 'red' }">
           {{
             scope.row.stock
-              ? scope.row.stock.opening_quantity_damaged + ' ' + scope.row.unit.unit
+              ? scope.row.stock.quantity_damaged + ' ' + scope.row.unit.unit
               : 'Not Fond'
           }}</span
         >
@@ -62,7 +66,7 @@
         <span :style="{ color: scope.row.stock ? 'black' : 'red' }"
           >{{
             scope.row.stock
-              ? scope.row.stock.opening_quantity_good + scope.row.stock.opening_quantity_damaged
+              ? scope.row.stock.quantity_good + scope.row.stock.quantity_damaged
               : 'Not Fond'
           }}
           {{ scope.row.stock ? scope.row.unit.unit : '' }}</span
@@ -70,11 +74,19 @@
       </template>
     </el-table-column>
   </el-table>
+  <!-- <el-dialog v-model="showchallan.visible" :title="showchallan.title" width="800"> -->
+  <ShowStockChallan
+    v-if="current_job == 'challan'"
+    :dataRecord="showchallan.dataRecord"
+    @close="gotoshow()"
+  />
+  <!-- </el-dialog> -->
 </template>
 <script lang="ts" setup>
 //import { useMenuItemsStore } from '@/store/menuItems'
 
 import { getProductsWithStockBalance } from '@/api/product'
+import ShowStockChallan from './ShowStockChallan.vue'
 import '@/functions/interfeces'
 
 //import AddEditProduct from './AddEditProduct.vue'
@@ -104,6 +116,7 @@ export default {
       productUnits,
       stocktableshow: true,
       count: 1,
+      showchallan: { dataRecord: {}, visible: false, title: '' },
       productTypes: [
         'Lamp',
         'Lamp SKD Items',
@@ -126,6 +139,24 @@ export default {
     // this.getproductswithstockbalance()
   },
   methods: {
+    gotoshow() {
+      this.current_job = 'show'
+    },
+    handlechallanhistry(row: any) {
+      this.showchallan.dataRecord = {
+        product_uid: row.stock.product_uid,
+        from: row.stock.created_at,
+        to: 'last',
+        opening_good: row.stock.opening_quantity_good,
+        opening_damaged: row.stock.opening_quantity_damaged,
+        good_quantity: row.stock.quantity_good,
+        damaged_quantity: row.stock.quantity_damaged,
+        name: row.name
+      }
+      this.showchallan.visible = true
+      this.showchallan.title = 'Stock History Of  ' + row.name
+      this.current_job = 'challan'
+    },
     doneaddedit() {
       this.getproductswithstockbalance(this.current_page)
       this.current_job = 'show'

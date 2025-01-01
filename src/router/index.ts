@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import StockView from '../views/stock/StockPage.vue'
 import StockStart from '../views/stock/StockStart.vue'
 import TransferView from '@/views/chalan/Transfer.vue'
-import DotoView from '@/views/bd/doto.vue'
 // import rolechecker from '@/router/rolecheker'
 
 const router = createRouter({
@@ -13,11 +12,6 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
-    },
-    {
-      path: '/doto',
-      name: 'doto',
-      component: DotoView
     },
     {
       path: '/stock',

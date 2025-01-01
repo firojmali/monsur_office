@@ -1,4 +1,4 @@
-const type = 0 //1=server     0=local
+const type = 1 //1=server     0=local
 
 import axios from 'axios'
 import { ElMessage } from 'element-plus' //ElMessageBox,

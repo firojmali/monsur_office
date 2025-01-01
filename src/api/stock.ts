@@ -14,3 +14,10 @@ export function updateProduct(uid: string | number, data: {}) {
     data
   })
 }
+export function stockChallans(data: {}) {
+  return request({
+    url: '/stock/product/challan/history',
+    method: 'post',
+    data
+  })
+}
