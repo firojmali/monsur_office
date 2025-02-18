@@ -1,4 +1,4 @@
-const type = 1 //1=server     0=local
+const type = 0 //1=server     0=local
 
 import axios from 'axios'
 import { ElMessage } from 'element-plus' //ElMessageBox,
@@ -10,7 +10,7 @@ import { getToken, getTokenId } from '@/utils/auth'
 const token = getToken()
 const tokenid = getTokenId()
 const base_local = 'http://127.0.0.1:8000/api'
-const base_remote = 'https://at.mmtgroupbd.com/public/api'
+const base_remote = 'http://at.mmtgroupbd.com/public/api'
 let base_active = base_local
 if (type) {
   base_active = base_remote

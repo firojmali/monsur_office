@@ -147,6 +147,28 @@ export default {
               sub: []
             }
           ]
+        },
+        {
+          label: 'Manufacture',
+          router_name: '',
+          menu_index: '3',
+          router_to: '',
+          sub: [
+            {
+              label: 'Products',
+              router_name: 'Manufacture Product',
+              menu_index: '1',
+              router_to: '/manu/products',
+              sub: []
+            },
+            {
+              label: 'Manufacture Now',
+              router_name: 'Manufacture',
+              menu_index: '2',
+              router_to: '/manu/manufacture',
+              sub: []
+            }
+          ]
         }
       ],
       user1: {
@@ -165,7 +187,7 @@ export default {
     }
   },
   created() {
-    this.testserver()
+    //this.testserver()
     var presentdt = parseInt(String(Date.now() / 1000))
     this.checkLogIn()
     this.getcommondatas(presentdt)
@@ -224,6 +246,7 @@ export default {
         login({ name: this.loginfeilds.user_id, password: this.loginfeilds.password })
           .then((res: any) => {
             this.activework = false
+            alert('sdfasdf')
             if (res.code == 20000) {
               //log in success
               const userstore = useUserItemStore()

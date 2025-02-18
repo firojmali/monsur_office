@@ -113,6 +113,9 @@ export const useUserItemStore = defineStore('userItem', {
       this.setAll(user)
       setToken(logindata.remember_token)
       setTokenId(logindata.updated_at)
+      console.log('remembertoken', logindata.remember_token)
+      console.log('tokenid', logindata.updated_at)
+      alert('sdfsdfsdaf')
     }
   },
   persist: {

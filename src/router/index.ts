@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import StockView from '../views/stock/StockPage.vue'
 import StockStart from '../views/stock/StockStart.vue'
 import TransferView from '@/views/chalan/Transfer.vue'
+import ManuManu from '@/views/manufacture/ManuManu.vue'
+import ManuProducts from '@/views/manufacture/ManuProducts.vue'
 // import rolechecker from '@/router/rolecheker'
 
 const router = createRouter({
@@ -43,6 +45,16 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/StockLedgerView.vue')
+    },
+    {
+      path: '/manu/manufacture',
+      name: 'Manufacture',
+      component: ManuManu
+    },
+    {
+      path: '/manu/products',
+      name: 'Manufacture Product',
+      component: ManuProducts
     }
   ]
 })
