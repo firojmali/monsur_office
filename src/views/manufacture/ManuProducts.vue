@@ -8,13 +8,39 @@
     <div class="w-full text-right">
       <el-button type="primary" @click="handleAdd">Add Manufactring Product</el-button>
     </div>
-    <el-table :data="productsManu" style="width: 100%"> </el-table>
+    <el-table :data="productsManu" style="width: 100%">
+      <el-table-column label="Product Name" prop="name"></el-table-column>
+      <el-table-column label="Action">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            size="small"
+            @click.prevent="editproduct(scope.row)"
+            :disabled="adding"
+          >
+            Edit
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </el-card>
 
-  <el-dialog v-model="dialogVisible" title="Add Manufacturing Product" fullscreen width="100%">
+  <el-dialog
+    v-model="dialogVisible"
+    :title="is_new ? 'Add Manufacturing Product' : 'Edit Manufacturing Product'"
+    fullscreen
+    width="100%"
+  >
     <el-form :model="addform" :rules="rules" label-width="auto" style="max-width: 99%">
-      <el-form-item label="Product Tobe Manufactured">
-        <el-select v-model="addform.product_uid" placeholder="please select Product to Manufacture">
+      <el-form-item
+        :label="is_new ? 'Product Tobe Manufactured' : 'Edit Manufacturing item list for'"
+      >
+        <el-select
+          v-if="is_new"
+          v-model="addform.product_uid"
+          placeholder="please select Product to Manufacture"
+        >
           <el-option
             v-for="item in productsNotManu"
             :key="item.uid"
@@ -22,6 +48,9 @@
             :value="item.uid"
           />
         </el-select>
+        <span v-else
+          ><b> '{{ editproductname }}'</b><br />
+        </span>
         <el-form-item label="remarkss "
           ><el-input type="textarea" row="3" v-model="addform.remarks"
         /></el-form-item>
@@ -75,7 +104,9 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="addmanuproduct" :disabled="adding"> Confirm </el-button>
+        <el-button type="primary" @click="addmanuproduct" :disabled="adding">
+          {{ is_new ? 'Save' : 'Update' }}
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -87,7 +118,12 @@ import { ref } from 'vue'
 import moment from 'moment'
 //import { Plus } from '@element-plus/icons-vue'
 
-import { getProductswithManu, insertManuProduct } from '@/api/manu'
+import {
+  getmanuproductsitems,
+  getProductswithManu,
+  insertManuProduct,
+  updateManuProduct
+} from '@/api/manu'
 export default {
   name: 'ManuProducts',
   data() {
@@ -101,7 +137,15 @@ export default {
       productsManu,
       productsNotManu,
       adding: false,
+      editproductname: '',
+      is_new: true,
+      update_uid: '',
       addform: {
+        product_uid: null,
+        remarks: '',
+        items: [{ product_uid: null, quantity: 0 }]
+      },
+      prevAddform: {
         product_uid: null,
         remarks: '',
         items: [{ product_uid: null, quantity: 0 }]
@@ -125,6 +169,38 @@ export default {
   },
   updated() {},
   methods: {
+    editproduct(s: any) {
+      this.editproductname = s.name
+      s = s.manuproduct
+      this.update_uid = s.uid
+      this.is_new = false
+      this.adding = true
+      this.addform = {
+        product_uid: s.product_uid,
+        remarks: s.remarks,
+        items: []
+      }
+      this.prevAddform.product_uid = s.product_uid
+      this.prevAddform.remarks = s.remarks
+      this.prevAddform.items = []
+      this.wait = true
+      new Promise((resolve, reject) => {
+        getmanuproductsitems(s.uid)
+          .then((res: any) => {
+            res.data.items.forEach((item: any) => {
+              this.addform.items.push({ ...item })
+              this.prevAddform.items.push({ ...item })
+            })
+            this.adding = false
+            this.wait = false
+            this.dialogVisible = true
+          })
+          .catch((err: string) => {
+            reject(false)
+            err
+          })
+      })
+    },
     addmanuproduct() {
       let msg = null
       //this.adding = true
@@ -146,7 +222,8 @@ export default {
 
       if (msg == null) {
         console.log('success')
-        this.insert()
+        if (this.is_new) this.insert()
+        else this.update()
         //this.dialogVisible = false
       } else {
         ElMessage.error(msg)
@@ -154,6 +231,7 @@ export default {
       }
     },
     handleAdd() {
+      this.is_new = true
       this.dialogVisible = true
       this.addform = {
         product_uid: null,
@@ -177,6 +255,77 @@ export default {
           .then((res: any) => {
             this.products = res.data
             this.filterproducts()
+            this.wait = false
+          })
+          .catch((err: string) => {
+            reject(false)
+            err
+          })
+      })
+    },
+    update() {
+      let upd: any = []
+      let del: any = []
+      let add: any = []
+      let a = 0
+      let b = 0
+      let item_got = { product_uid: null, quantity: 0 }
+
+      this.prevAddform.items.forEach((item) => {
+        a = 0
+        b = 0
+        console.log(item.product_uid)
+        item_got = { product_uid: null, quantity: 0 }
+        this.addform.items.forEach((nitem) => {
+          if (item.product_uid == nitem.product_uid) {
+            item_got = { ...nitem }
+            console.log('with=', nitem.product_uid)
+            a = 1
+            if (item.quantity == nitem.quantity) {
+              b = 1
+            }
+          }
+        })
+        console.log('got = ', a)
+        if (a && !b) {
+          upd.push({ ...item_got })
+        }
+        if (!a) {
+          del.push(item.product_uid)
+        }
+      })
+
+      this.addform.items.forEach((nitem) => {
+        a = 0
+        this.prevAddform.items.forEach((item) => {
+          if (item.product_uid == nitem.product_uid) {
+            a = 1
+          }
+        })
+        if (!a) {
+          add.push({ ...nitem })
+        }
+      })
+      const manu_update =
+        this.prevAddform.remarks != this.addform.remarks ? this.addform.remarks : null
+      let dataToSend = { manu: manu_update, upd: [], del: [], add: [] }
+      console.log('prev = ', this.prevAddform)
+      console.log('add = ', add)
+      console.log('del = ', del)
+      console.log('upd = ', upd)
+      if (!add.length && !del.length && !upd.length && manu_update == null) {
+        ElMessage.warning('Nothing to Update')
+        return 1
+      } else {
+        dataToSend = { manu: manu_update, upd: upd, del: del, add: add }
+      }
+      return new Promise((resolve, reject) => {
+        updateManuProduct(this.update_uid, dataToSend)
+          .then((res: any) => {
+            this.products = res.product
+            console.log(res.data)
+            this.filterproducts()
+            this.dialogVisible = false
             this.wait = false
           })
           .catch((err: string) => {

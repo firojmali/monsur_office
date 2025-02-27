@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import '@/functions/interfeces'
 import routes from '@/router/routes'
-import { setToken, setTokenId, removeToken, removeTokenId } from '@/utils/auth'
+import { setToken, setTokenId, removeToken, removeTokenId, getTokenId } from '@/utils/auth'
 
 export const useUserItemStore = defineStore('userItem', {
   state: (): UserState => ({
@@ -114,8 +114,8 @@ export const useUserItemStore = defineStore('userItem', {
       setToken(logindata.remember_token)
       setTokenId(logindata.updated_at)
       console.log('remembertoken', logindata.remember_token)
-      console.log('tokenid', logindata.updated_at)
-      alert('sdfsdfsdaf')
+      console.log('tokenid', logindata.updated_at, this.getTokenId(), getTokenId())
+      //alert('sdfsdfsdaf')
     }
   },
   persist: {

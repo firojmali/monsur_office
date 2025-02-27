@@ -14,6 +14,8 @@ export function getTokenId() {
   return cookies.cookies.get(TokenIdKey)
 }
 export function setTokenId(token: any) {
+  cookies.cookies.set(TokenIdKey, 'token')
+  cookies.cookies.remove(TokenIdKey)
   cookies.cookies.set(TokenIdKey, token)
 }
 

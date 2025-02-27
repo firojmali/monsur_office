@@ -32,13 +32,13 @@
     <el-table-column label="Damaged Quantity" class="text-center">
       <el-table-column label="Delivery" prop="dam_d" width="90"
         ><template #default="scope">
-          <el-tag v-if="scope.row.dam_d > 0" type="danger">{{ scope.row.dam_d }}</el-tag>
+          <el-tag v-if="scope.row.dam_d > 0" :type="scope.row.type">{{ scope.row.dam_d }}</el-tag>
           <span v-else>---</span>
         </template>
       </el-table-column>
       <el-table-column label="Receive" prop="dam_r" width="90"
         ><template #default="scope">
-          <el-tag v-if="scope.row.dam_r > 0" type="primary">{{ scope.row.dam_r }}</el-tag>
+          <el-tag v-if="scope.row.dam_r > 0" :type="scope.row.type">{{ scope.row.dam_r }}</el-tag>
           <span v-else>---</span>
         </template>
       </el-table-column>
@@ -95,7 +95,8 @@ export default {
           dam_b: 0,
           total_b: 0,
           entry_by: '',
-          remarks: ''
+          remarks: '',
+          type: 'danger'
         }
       ]
     }
@@ -135,7 +136,8 @@ export default {
         dam_b: dam_b,
         total_b: total_b,
         entry_by: '',
-        remarks: ''
+        remarks: '',
+        type: 'warning'
       })
 
       this.showdata.challans.forEach((chalan: any) => {
@@ -143,6 +145,7 @@ export default {
         const gr = chalan.is_in ? chalan.quantity_good : 0
         const bd = chalan.is_in ? 0 : chalan.quantity_damaged
         const br = chalan.is_in ? chalan.quantity_damaged : 0
+        let type = 'danger'
         good_d = gd + good_d
         good_r = gr + good_r
         good_b = good_b - gd + gr
@@ -150,12 +153,25 @@ export default {
         dam_r = br + dam_r
         dam_b = dam_b - bd + br
         total_b = good_b + dam_b
+        let des = ''
+        if (chalan.challan.party.includes('MN8975')) {
+          des = chalan.is_in
+            ? 'Manufactured - item challan: ' + chalan.challan.challan_number.replace('_in', '_out')
+            : 'To Manufactur Unit - Complete challan' +
+              chalan.challan.challan_number.replace('_out', '_in')
+          type = 'success'
+        } else {
+          des = chalan.is_in
+            ? 'Received From ' + chalan.challan.party
+            : 'Delivery To ' + chalan.challan.party
+          if (chalan.is_in) {
+            type = 'primary'
+          }
+        }
         this.table_data.push({
           date: chalan.created_at,
           challan_number: chalan.challan.challan_number,
-          description: chalan.is_in
-            ? 'Received From ' + chalan.challan.party
-            : 'Delivery To ' + chalan.challan.party,
+          description: des,
           good_d: gd,
           good_r: gr,
           good_b: good_b,
@@ -164,7 +180,8 @@ export default {
           dam_b: dam_b,
           total_b: total_b,
           entry_by: '',
-          remarks: chalan.remarks
+          remarks: chalan.remarks,
+          type: type
         })
       })
       this.table_data.push({
@@ -179,7 +196,8 @@ export default {
         dam_b: this.dataRecord.damaged_quantity,
         total_b: this.dataRecord.good_quantity + this.dataRecord.damaged_quantity,
         entry_by: '',
-        remarks: ''
+        remarks: '',
+        type: 'success'
       })
     },
     emitclose() {

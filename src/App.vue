@@ -219,7 +219,7 @@ export default {
     getrouternameindex() {
       const prn = this.$route.name
       const indx = this.getforeachmenuindex(prn, this.menu)
-      console.log(indx)
+      //console.log(indx)
       return indx
     },
     getforeachmenuindex(prn: any, menu: any, preindex: any = '') {
@@ -246,7 +246,7 @@ export default {
         login({ name: this.loginfeilds.user_id, password: this.loginfeilds.password })
           .then((res: any) => {
             this.activework = false
-            alert('sdfasdf')
+            //alert('sdfasdf')
             if (res.code == 20000) {
               //log in success
               const userstore = useUserItemStore()
